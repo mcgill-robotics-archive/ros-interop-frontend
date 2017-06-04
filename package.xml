@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>interop_frontend</name>
+  <version>0.1.0</version>
+  <description>ROS interop frontend</description>
+
+  <maintainer email="mr@anassinator.com">Anass Al</maintainer>
+
+  <license>MIT</license>
+
+  <url type="website">
+    https://github.com/mcgill-robotics/ros-interop-frontend
+  </url>
+
+  <author email="mr@anassinator.com">Anass Al</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>npm</build_depend>
+  <run_depend>nodejs</run_depend>
+
+  <export>
+  </export>
+</package>

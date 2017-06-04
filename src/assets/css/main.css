@@ -1,0 +1,29 @@
+$darkColor: #333333;
+$highlightColor: #E8E8E8;
+$backgroundColor: #F6F6F6;
+
+html {
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: $darkColor;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: $darkColor;
+  text-decoration: none;
+  outline: none;
+}
+
+a img {
+  border: 0;
+}
