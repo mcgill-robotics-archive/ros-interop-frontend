@@ -34,6 +34,7 @@ class App extends React.Component {
       // Active target.
       focused_index: undefined,
       preview_image: undefined,
+      new_target: undefined,
     };
   }
 
@@ -49,6 +50,7 @@ class App extends React.Component {
 
   handleFocus = (index) => {
     this.setState({
+      new_target: false,
       focused_index: index,
       preview_image: this.state.target_images[index],
     });
@@ -64,8 +66,13 @@ class App extends React.Component {
   };
 
   handleSubmitTarget = (index) => {
+    const latestIndex = this.state.new_target
+      ? this.state.latest_index + 1
+      : this.state.latest_index;
     const delta = { [index]: this.state.preview_image };
     this.setState({
+      new_target: false,
+      latest_index: latestIndex,
       target_images: Object.assign({}, this.state.target_images, delta),
     });
   }
@@ -85,8 +92,8 @@ class App extends React.Component {
     };
 
     this.setState({
+      new_target: true,
       targets: Object.assign({}, this.state.targets, delta),
-      latest_index: newIndex,
       focused_index: newIndex,
     });
   };
@@ -104,6 +111,7 @@ class App extends React.Component {
           preview={this.state.preview_image}
           target={this.state.targets[this.state.focused_index]}
           onNewTarget={this.handleNewTarget}
+          newTargetEnabled={!this.state.new_target}
         />
         <TargetList
           images={this.state.target_images}

@@ -43,3 +43,8 @@ $backgroundColor: #F6F6F6;
   background: $darkColor;
   color: $backgroundColor;
 }
+
+.content .add:disabled {
+  color: $highlightColor;
+  border-color: $highlightColor;
+}
