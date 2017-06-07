@@ -5,39 +5,68 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      // Targets.
       targets: {},
+      target_images: {},
       curr_index: 0,
-    };
 
-    this.handleNewTarget = this.handleNewTarget.bind(this);
-    this.handleDeleteTarget = this.handleDeleteTarget.bind(this);
+      // Frame.
+      curr_image: 'http://braavos.me/images/posts/college-rock/the-smiths.png',
+
+      // Active target.
+      focused_index: 0,
+      preview_image: '',
+    };
   }
 
-  handleDeleteTarget(index) {
+  componentWillMount() {
+    this.handleNewTarget();
+  }
+
+  handleCrop = (previewImage) => {
+    this.setState({
+      preview_image: previewImage,
+    });
+  };
+
+  handleDeleteTarget = (index) => {
     delete this.state.targets[index];
     this.setState({
       targets: this.state.targets,
     });
-  }
+  };
 
-  handleNewTarget() {
+  handleNewTarget = () => {
     const newIndex = this.state.curr_index + 1;
     const targetsDelta = {};
-    targetsDelta[newIndex] = <Target index={newIndex} onDelete={this.handleDeleteTarget} />;
+    targetsDelta[newIndex] = (
+      <Target
+        index={newIndex}
+        onDelete={this.handleDeleteTarget}
+      />
+    );
 
     this.setState({
       targets: Object.assign({}, this.state.targets, targetsDelta),
       curr_index: newIndex,
+      focused_index: newIndex,
     });
-  }
+  };
 
   render() {
-    require('../../assets/css/main.css');
+    const styles = require('../../assets/css/main.css');
 
     return (
-      <div>
-        <Canvas />
-        <Sidebar targets={this.state.targets} onNewTarget={this.handleNewTarget} />
+      <div className={styles.container}>
+        <Canvas
+          src={this.state.curr_image}
+          onCrop={this.handleCrop}
+        />
+        <Sidebar
+          preview={this.state.preview_image}
+          target={this.state.targets[this.state.focused_index]}
+          onNewTarget={this.handleNewTarget}
+        />
       </div>
     );
   }

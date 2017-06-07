@@ -6,7 +6,7 @@ class Target extends React.Component {
     index: PropTypes.number.isRequired,
     onSubmit: PropTypes.func,
     onDelete: PropTypes.func,
-  }
+  };
 
   static colors = [
     { value: 'black', label: 'Black' },
@@ -64,31 +64,19 @@ class Target extends React.Component {
       orientation: '',
       shape: '',
       type: 'standard',
-      collapsed: false,
     };
-
-    this.handleClick = this.handleClick.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
   }
 
-  handleClick() {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
-  }
-
-  handleChange(event) {
+  handleChange = (event) => {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     this.setState({
       [name]: value
     });
-  }
+  };
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
 
     this.setState({ collapsed: true });
@@ -96,9 +84,9 @@ class Target extends React.Component {
     if (this.props.onSubmit !== undefined) {
       this.props.onSubmit(this.props.index, this.state);
     }
-  }
+  };
 
-  handleDelete(event) {
+  handleDelete = (event) => {
     event.preventDefault();
     console.log(this);
 
@@ -106,15 +94,13 @@ class Target extends React.Component {
       console.log('delete');
       this.props.onDelete(this.props.index);
     }
-  }
+  };
 
-  renderSelection(name, value, options) {
-    return (
-      <select name={name} value={value} onChange={this.handleChange}>
-        {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-      </select>
-    );
-  }
+  renderSelection = (name, value, options) => (
+    <select name={name} value={value} onChange={this.handleChange}>
+      {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+    </select>
+  );
 
   render() {
     const styles = require('./Target.css');
@@ -134,11 +120,9 @@ class Target extends React.Component {
       </form>
     );
 
-    const collapse = <button className={styles.collapse}onClick={this.handleClick}>{this.state.collapsed ? '+' : '-'}</button>;
-
     return (
       <div className={styles.content}>
-        {header}{collapse}
+        {header}
         {body}
       </div>
     );

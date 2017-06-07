@@ -39,23 +39,9 @@ $backgroundColor: #F6F6F6;
   -webkit-border-radius: 0;
 }
 
-.content .collapsed,
 .content :disabled {
   color: $highlightColor;
   border-color: $highlightColor;
-}
-
-.content .collapse,
-.content .collapse:active,
-.content .collapse:hover {
-  background: none;
-  border: none;
-  outline: none;
-  font-size: 20px;
-  float: right;
-  padding: 10px;
-  cursor: pointer;
-  margin: -10px;
 }
 
 .content .submit,

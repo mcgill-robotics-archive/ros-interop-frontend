@@ -6,17 +6,16 @@ const Sidebar = (props) => {
 
   return (
     <div className={styles.content} id="sidebar">
-      <h1>Target List</h1>
-      <div className={styles.targets}>
-        {Object.keys(props.targets).map(i => <ul key={i}>{props.targets[i]}</ul>)}
-      </div>
-      <button className={styles.add} onClick={() => props.onNewTarget()}>NEW TARGET</button>
+      <img className={styles.preview} src={props.preview} alt="preview" />
+      {props.target}
+      <button className={styles.add} onClick={props.onNewTarget}>NEW TARGET</button>
     </div>
   );
 };
 
 Sidebar.propTypes = {
-  targets: PropTypes.object.isRequired,
+  preview: PropTypes.string,
+  target: PropTypes.object.isRequired,
   onNewTarget: PropTypes.func.isRequired,
 };
 
