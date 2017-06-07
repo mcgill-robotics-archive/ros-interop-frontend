@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 class Target extends React.Component {
   static propTypes = {
     index: PropTypes.number.isRequired,
+    instance: PropTypes.object.isRequired,
     onSubmit: PropTypes.func,
     onDelete: PropTypes.func,
   };
@@ -59,12 +60,25 @@ class Target extends React.Component {
     this.state = {
       id: undefined,
       alphanumeric: '',
-      background_color: '',
-      alphanumeric_color: '',
-      orientation: '',
-      shape: '',
+      background_color: 'black',
+      alphanumeric_color: 'black',
+      orientation: 'n',
+      shape: 'circle',
       type: 'standard',
     };
+  }
+
+  componentWillMount() {
+    this.restore();
+  }
+
+  restore = () => {
+    this.props.instance.restore(this);
+  }
+
+  save = () => {
+    const state = this.state;
+    this.props.instance.save(ctx => ctx.setState(state));
   }
 
   handleChange = (event) => {
@@ -72,13 +86,13 @@ class Target extends React.Component {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     this.setState({
-      [name]: value
+      [name]: value,
     });
   };
 
   handleSubmit = (event) => {
     event.preventDefault();
-
+    this.save();
     if (this.props.onSubmit !== undefined) {
       this.props.onSubmit(this.props.index, this.state);
     }
@@ -86,10 +100,8 @@ class Target extends React.Component {
 
   handleDelete = (event) => {
     event.preventDefault();
-    console.log(this);
 
     if (this.props.onDelete !== undefined) {
-      console.log('delete');
       this.props.onDelete(this.props.index);
     }
   };
@@ -113,7 +125,7 @@ class Target extends React.Component {
         Orientation: {this.renderSelection('orientation', this.state.orientation, Target.orientations)}
         Shape: {this.renderSelection('shape', this.state.shape, Target.shapes)}
         Type: {this.renderSelection('type', this.state.type, Target.types)}
-        <button className={styles.submit} onClick={this.handleSubmit}>SUBMIT</button>
+        <button className={styles.submit} onClick={this.handleSubmit}>SAVE</button>
         <button className={styles.delete} onClick={this.handleDelete}>DELETE</button>
       </form>
     );

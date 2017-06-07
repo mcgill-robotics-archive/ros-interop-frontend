@@ -1,6 +1,24 @@
 import React from 'react';
 import { Canvas, Target, Sidebar, TargetList } from '../../components';
 
+
+class RestorableInstance {
+  constructor() {
+    this.func = null;
+  }
+
+  save(f) {
+    this.func = f;
+  }
+
+  restore(context) {
+    if (this.func) {
+      this.func(context);
+    }
+  }
+}
+
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -30,7 +48,6 @@ class App extends React.Component {
   };
 
   handleFocus = (index) => {
-    console.log(index);
     this.setState({
       focused_index: index,
       preview_image: this.state.target_images[index],
@@ -50,7 +67,6 @@ class App extends React.Component {
     const delta = { [index]: this.state.preview_image };
     this.setState({
       target_images: Object.assign({}, this.state.target_images, delta),
-      focused_index: undefined,
     });
   }
 
@@ -59,7 +75,9 @@ class App extends React.Component {
     const delta = {
       [newIndex]: (
         <Target
+          key={newIndex}
           index={newIndex}
+          instance={new RestorableInstance()}
           onDelete={this.handleDeleteTarget}
           onSubmit={this.handleSubmitTarget}
         />
