@@ -79,8 +79,6 @@ class Target extends React.Component {
   handleSubmit = (event) => {
     event.preventDefault();
 
-    this.setState({ collapsed: true });
-
     if (this.props.onSubmit !== undefined) {
       this.props.onSubmit(this.props.index, this.state);
     }
@@ -108,7 +106,7 @@ class Target extends React.Component {
     const header = <span className={styles.header}>Target {this.props.index}</span>;
 
     const body = (
-      <form onSubmit={() => {}} hidden={this.state.collapsed}>
+      <form onSubmit={() => {}}>
         Letter: <input type="text" maxLength="1" name="alphanumeric" value={this.state.alphanumeric} onChange={this.handleChange} /><br />
         Background Color: {this.renderSelection('background_color', this.state.background_color, Target.colors)}
         Foreground Color: {this.renderSelection('alphanumeric_color', this.state.alphanumeric_color, Target.colors)}

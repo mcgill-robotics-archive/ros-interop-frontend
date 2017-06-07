@@ -1,5 +1,5 @@
 import React from 'react';
-import { Canvas, Target, Sidebar } from '../../components';
+import { Canvas, Target, Sidebar, TargetList } from '../../components';
 
 class App extends React.Component {
   constructor(props) {
@@ -8,14 +8,14 @@ class App extends React.Component {
       // Targets.
       targets: {},
       target_images: {},
-      curr_index: 0,
+      latest_index: 0,
 
       // Frame.
-      curr_image: 'http://braavos.me/images/posts/college-rock/the-smiths.png',
+      curr_image: 'http://roadmanfong.github.io/react-cropper/example/img/child.jpg',
 
       // Active target.
-      focused_index: 0,
-      preview_image: '',
+      focused_index: undefined,
+      preview_image: undefined,
     };
   }
 
@@ -29,26 +29,46 @@ class App extends React.Component {
     });
   };
 
+  handleFocus = (index) => {
+    console.log(index);
+    this.setState({
+      focused_index: index,
+      preview_image: this.state.target_images[index],
+    });
+  }
+
   handleDeleteTarget = (index) => {
+    delete this.state.target_images[index];
     delete this.state.targets[index];
     this.setState({
       targets: this.state.targets,
+      target_images: this.state.target_images,
     });
   };
 
+  handleSubmitTarget = (index) => {
+    const delta = { [index]: this.state.preview_image };
+    this.setState({
+      target_images: Object.assign({}, this.state.target_images, delta),
+      focused_index: undefined,
+    });
+  }
+
   handleNewTarget = () => {
-    const newIndex = this.state.curr_index + 1;
-    const targetsDelta = {};
-    targetsDelta[newIndex] = (
-      <Target
-        index={newIndex}
-        onDelete={this.handleDeleteTarget}
-      />
-    );
+    const newIndex = this.state.latest_index + 1;
+    const delta = {
+      [newIndex]: (
+        <Target
+          index={newIndex}
+          onDelete={this.handleDeleteTarget}
+          onSubmit={this.handleSubmitTarget}
+        />
+      )
+    };
 
     this.setState({
-      targets: Object.assign({}, this.state.targets, targetsDelta),
-      curr_index: newIndex,
+      targets: Object.assign({}, this.state.targets, delta),
+      latest_index: newIndex,
       focused_index: newIndex,
     });
   };
@@ -66,6 +86,10 @@ class App extends React.Component {
           preview={this.state.preview_image}
           target={this.state.targets[this.state.focused_index]}
           onNewTarget={this.handleNewTarget}
+        />
+        <TargetList
+          images={this.state.target_images}
+          onSelection={this.handleFocus}
         />
       </div>
     );

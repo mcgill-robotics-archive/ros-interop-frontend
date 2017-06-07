@@ -1,0 +1,41 @@
+$darkColor: #333333;
+$redColor: #990100;
+$highlightColor: #E8E8E8;
+$backgroundColor: #F6F6F6;
+
+$thumbnailSize: 128px;
+
+.content {
+  background-color: #f6f6f6;
+  width: calc(100vw - 360px);
+  height: $thumbnailSize;
+  position: fixed;
+  bottom: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.content ul {
+  display: inline-block;
+}
+
+.content button {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  width: $thumbnailSize;
+  height: $thumbnailSize;
+}
+
+.content img {
+  width: $thumbnailSize;
+  height: $thumbnailSize;
+  opacity: 0.8;
+}
+
+.content img:hover {
+  opacity: 1.0;
+}

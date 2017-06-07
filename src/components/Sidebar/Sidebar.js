@@ -5,7 +5,7 @@ const Sidebar = (props) => {
   const styles = require('./Sidebar.css');
 
   return (
-    <div className={styles.content} id="sidebar">
+    <div className={styles.content}>
       <img className={styles.preview} src={props.preview} alt="preview" />
       {props.target}
       <button className={styles.add} onClick={props.onNewTarget}>NEW TARGET</button>
@@ -15,7 +15,7 @@ const Sidebar = (props) => {
 
 Sidebar.propTypes = {
   preview: PropTypes.string,
-  target: PropTypes.object.isRequired,
+  target: PropTypes.object,
   onNewTarget: PropTypes.func.isRequired,
 };
 
