@@ -54,7 +54,7 @@ class App extends React.Component {
       focused_index: index,
       preview_image: this.state.target_images[index],
     });
-  }
+  };
 
   handleDeleteTarget = (index) => {
     delete this.state.target_images[index];
@@ -69,31 +69,29 @@ class App extends React.Component {
     const latestIndex = this.state.new_target
       ? this.state.latest_index + 1
       : this.state.latest_index;
-    const delta = { [index]: this.state.preview_image };
+    this.state.target_images[index] = this.state.preview_image;
     this.setState({
       new_target: false,
       latest_index: latestIndex,
-      target_images: Object.assign({}, this.state.target_images, delta),
+      target_images: this.state.target_images,
     });
-  }
+  };
 
   handleNewTarget = () => {
     const newIndex = this.state.latest_index + 1;
-    const delta = {
-      [newIndex]: (
-        <Target
-          key={newIndex}
-          index={newIndex}
-          instance={new RestorableInstance()}
-          onDelete={this.handleDeleteTarget}
-          onSubmit={this.handleSubmitTarget}
-        />
-      )
-    };
+    this.state.targets[newIndex] = (
+      <Target
+        key={newIndex}
+        index={newIndex}
+        instance={new RestorableInstance()}
+        onDelete={this.handleDeleteTarget}
+        onSubmit={this.handleSubmitTarget}
+      />
+    );
 
     this.setState({
       new_target: true,
-      targets: Object.assign({}, this.state.targets, delta),
+      targets: this.state.targets,
       focused_index: newIndex,
     });
   };
