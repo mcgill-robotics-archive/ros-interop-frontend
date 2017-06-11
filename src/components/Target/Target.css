@@ -18,10 +18,13 @@ $backgroundColor: #F6F6F6;
 
 .content form {
   margin-top: 10px;
+  height: 490px;
+  overflow-y: scroll;
 }
 
 .content input,
-.content select {
+.content select,
+.content textarea {
   color: $darkColor;
   border: solid 1px $darkColor;
   outline: none;
@@ -30,6 +33,20 @@ $backgroundColor: #F6F6F6;
   margin: 10px 0;
   text-transform: uppercase;
   text-indent: 10px;
+}
+
+.content textarea {
+  padding: 8px 10px;
+  text-indent: 0;
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  margin-bottom: 0;
+}
+
+.content input {
+  /* Compensate for border */
+  width: calc(100% - 2px);
 }
 
 .saved {
@@ -64,12 +81,13 @@ $backgroundColor: #F6F6F6;
   height: 50px;
   left: 0;
   right: 0;
-  width: 100%;
+  width: 48%;
 }
 
 .content .submit {
   color: $darkColor;
   border-color: $darkColor;
+  margin-right: 4%;
 }
 
 .content .delete {

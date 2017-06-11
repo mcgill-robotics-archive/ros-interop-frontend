@@ -71,6 +71,7 @@ class Target extends React.Component {
       orientation: '',
       shape: '',
       type: 'standard',
+      description: '',
     };
 
     this.savedState = undefined;
@@ -139,6 +140,16 @@ class Target extends React.Component {
     />
   );
 
+  renderTextArea = (name, value, props = {}) => (
+    <textarea
+      name={name}
+      value={value}
+      onChange={this.handleChange}
+      className={this.getStateClassName(name)}
+      {...props}
+    />
+  );
+
   renderSelection = (name, value, options) => (
     <select
       name={name}
@@ -160,14 +171,13 @@ class Target extends React.Component {
 
     const body = (
       <form onSubmit={() => {}}>
-        Letter: {this.renderInputText('alphanumeric', this.state.alphanumeric, { maxLength: '1' })}<br />
-        Background Color: {this.renderSelection('background_color', this.state.background_color, Target.colors)}
-        Foreground Color: {this.renderSelection('alphanumeric_color', this.state.alphanumeric_color, Target.colors)}
-        Orientation: {this.renderSelection('orientation', this.state.orientation, Target.orientations)}
-        Shape: {this.renderSelection('shape', this.state.shape, Target.shapes)}
         Type: {this.renderSelection('type', this.state.type, Target.types)}
-        <button className={styles.submit} onClick={this.handleSubmit}>SAVE</button>
-        <button className={styles.delete} onClick={this.handleDelete}>DELETE</button>
+        Letter: {this.renderInputText('alphanumeric', this.state.alphanumeric, { maxLength: '1' })}<br />
+        Letter Color: {this.renderSelection('alphanumeric_color', this.state.alphanumeric_color, Target.colors)}
+        Shape: {this.renderSelection('shape', this.state.shape, Target.shapes)}
+        Shape Color: {this.renderSelection('background_color', this.state.background_color, Target.colors)}
+        Orientation: {this.renderSelection('orientation', this.state.orientation, Target.orientations)}
+        Description: {this.renderTextArea('description', this.state.description)}
       </form>
     );
 
@@ -175,6 +185,8 @@ class Target extends React.Component {
       <div className={styles.content}>
         {header}
         {body}
+        <button className={styles.submit} onClick={this.handleSubmit}>SAVE</button>
+        <button className={styles.delete} onClick={this.handleDelete}>DELETE</button>
       </div>
     );
   }

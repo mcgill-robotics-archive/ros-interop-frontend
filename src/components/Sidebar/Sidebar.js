@@ -5,16 +5,19 @@ const Sidebar = (props) => {
   const styles = require('./Sidebar.css');
 
   return (
-    <div className={styles.content}>
-      <img className={styles.preview} src={props.preview} alt="preview" />
-      {props.target}
-      <button
-        className={styles.add}
-        onClick={props.onNewTarget}
-        disabled={!props.newTargetEnabled}
-      >
-        NEW TARGET
-      </button>
+    <div>
+      <div className={styles.placeholder} />
+      <div className={styles.content}>
+        <img className={styles.preview} src={props.preview} alt="preview" />
+        {props.target}
+        <button
+          className={styles.add}
+          onClick={props.onNewTarget}
+          disabled={!props.newTargetEnabled}
+        >
+          NEW TARGET
+        </button>
+      </div>
     </div>
   );
 };
