@@ -73,7 +73,7 @@ class Target extends React.Component {
       type: 'standard',
     };
 
-    this.savedState = Object.assign({}, this.state);
+    this.savedState = undefined;
   }
 
   componentWillMount() {
@@ -81,13 +81,13 @@ class Target extends React.Component {
   }
 
   setSavedState = (state) => {
-    this.savedState = state;
+    this.savedState = Object.assign({}, state);
     this.forceUpdate();
   };
 
   getStateClassName = name => (
-    this.state[name] !== this.savedState[name]
-    ? styles.edited : styles.saved
+    (this.savedState && this.state[name] === this.savedState[name])
+    ? styles.saved : styles.edited
   );
 
   restore = () => {
@@ -151,7 +151,12 @@ class Target extends React.Component {
   );
 
   render() {
-    const header = <span className={styles.header}>Target {this.props.index}</span>;
+    const title = `Target ${this.props.index}`;
+    const header = (
+      <span className={styles.header}>
+        {this.savedState ? title : <i>{title}</i>}
+      </span>
+    );
 
     const body = (
       <form onSubmit={() => {}}>
