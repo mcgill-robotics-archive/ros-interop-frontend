@@ -23,7 +23,6 @@ $backgroundColor: #F6F6F6;
 .content input,
 .content select {
   color: $darkColor;
-  background-color: rgba(0,0,0,0);
   border: solid 1px $darkColor;
   outline: none;
   width: 100%;
@@ -31,6 +30,16 @@ $backgroundColor: #F6F6F6;
   margin: 10px 0;
   text-transform: uppercase;
   text-indent: 10px;
+}
+
+.saved {
+  font-style: normal;
+  background-color: rgba(0,0,0,0) !important;
+}
+
+.edited {
+  font-style: italic;
+  background-color: $highlightColor !important;
 }
 
 .content select {

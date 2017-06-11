@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+const styles = require('./Target.css');
+
+
 class Target extends React.Component {
   static propTypes = {
     index: PropTypes.number.isRequired,
@@ -69,11 +72,23 @@ class Target extends React.Component {
       shape: '',
       type: 'standard',
     };
+
+    this.savedState = Object.assign({}, this.state);
   }
 
   componentWillMount() {
     this.restore();
   }
+
+  setSavedState = (state) => {
+    this.savedState = state;
+    this.forceUpdate();
+  };
+
+  getStateClassName = name => (
+    this.state[name] !== this.savedState[name]
+    ? styles.edited : styles.saved
+  );
 
   restore = () => {
     this.props.instance.restore(this);
@@ -81,7 +96,11 @@ class Target extends React.Component {
 
   save = () => {
     const state = this.state;
-    this.props.instance.save(ctx => ctx.setState(state));
+    this.setSavedState(state);
+    this.props.instance.save((ctx) => {
+      ctx.setState(state);
+      ctx.setSavedState(state);
+    });
   }
 
   handleChange = (event) => {
@@ -109,20 +128,34 @@ class Target extends React.Component {
     }
   };
 
+  renderInputText = (name, value, props = {}) => (
+    <input
+      type="text"
+      name={name}
+      value={value}
+      onChange={this.handleChange}
+      className={this.getStateClassName(name)}
+      {...props}
+    />
+  );
+
   renderSelection = (name, value, options) => (
-    <select name={name} value={value} onChange={this.handleChange}>
-      {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+    <select
+      name={name}
+      value={value}
+      onChange={this.handleChange}
+      className={this.getStateClassName(name)}
+    >
+      {options.map((opt, i) => <option key={i} value={opt.value}>{opt.label}</option>)}
     </select>
   );
 
   render() {
-    const styles = require('./Target.css');
-
     const header = <span className={styles.header}>Target {this.props.index}</span>;
 
     const body = (
       <form onSubmit={() => {}}>
-        Letter: <input type="text" maxLength="1" name="alphanumeric" value={this.state.alphanumeric} onChange={this.handleChange} /><br />
+        Letter: {this.renderInputText('alphanumeric', this.state.alphanumeric, { maxLength: '1' })}<br />
         Background Color: {this.renderSelection('background_color', this.state.background_color, Target.colors)}
         Foreground Color: {this.renderSelection('alphanumeric_color', this.state.alphanumeric_color, Target.colors)}
         Orientation: {this.renderSelection('orientation', this.state.orientation, Target.orientations)}
