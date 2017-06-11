@@ -3,25 +3,14 @@ $redColor: #990100;
 $highlightColor: #E8E8E8;
 $backgroundColor: #F6F6F6;
 
-.content,
-.placeholder {
+.content {
   text-align: left;
   line-height: 20px;
   background-color: $backgroundColor;
   width: 320px;
+  height: 100%;
   padding: 0 20px;
   float: right;
-}
-
-.placeholder {
-  position: fixed;
-  right: 0;
-  height: 100vh;
-  z-index: -1;
-}
-
-.content {
-  height: 100%;
 }
 
 .content .preview {

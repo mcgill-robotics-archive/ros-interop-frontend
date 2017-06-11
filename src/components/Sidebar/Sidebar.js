@@ -6,7 +6,6 @@ const Sidebar = (props) => {
 
   return (
     <div>
-      <div className={styles.placeholder} />
       <div className={styles.content}>
         <img className={styles.preview} src={props.preview} alt="preview" />
         {props.target}
