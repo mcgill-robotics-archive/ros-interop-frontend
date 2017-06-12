@@ -1,5 +1,5 @@
 import React from 'react';
-import { Canvas, Target, Sidebar, TargetList } from '../../components';
+import { Canvas, Target, Sidebar, TargetList, Notification } from '../../components';
 
 
 class RestorableInstance {
@@ -35,6 +35,9 @@ class App extends React.Component {
       focused_index: undefined,
       preview_image: undefined,
       new_target: undefined,
+
+      // Notification container.
+      notification: undefined,
     };
   }
 
@@ -49,10 +52,15 @@ class App extends React.Component {
   };
 
   handleFocus = (index) => {
+    const prevIndex = this.state.focused_index;
     this.setState({
       new_target: false,
       focused_index: index,
       preview_image: this.state.target_images[index],
+    }, () => {
+      if (index !== prevIndex) {
+        this.notify(`SWITCHED TO TARGET ${index}`);
+      }
     });
   };
 
@@ -62,7 +70,7 @@ class App extends React.Component {
     this.setState({
       targets: this.state.targets,
       target_images: this.state.target_images,
-    });
+    }, () => this.notify(`DELETED TARGET ${index}`));
   };
 
   handleSubmitTarget = (index) => {
@@ -74,7 +82,7 @@ class App extends React.Component {
       new_target: false,
       latest_index: latestIndex,
       target_images: this.state.target_images,
-    });
+    }, () => this.notify(`SAVED TARGET ${index}`));
   };
 
   handleNewTarget = () => {
@@ -93,14 +101,33 @@ class App extends React.Component {
       new_target: true,
       targets: this.state.targets,
       focused_index: newIndex,
+    }, () => {
+      if (newIndex > 1) {
+        // Don't notify on app launch.
+        this.notify(`NEW TARGET ${newIndex}`);
+      }
     });
   };
+
+  notify = (msg: string) => {
+    const notification = (
+      <Notification
+        message={msg}
+        dismissAfter={500}
+        onDismiss={() => {
+          this.setState({ notification: undefined });
+        }}
+      />
+    );
+    this.setState({ notification });
+  }
 
   render() {
     const styles = require('../../assets/css/main.css');
 
     return (
       <div className={styles.container}>
+        {this.state.notification}
         <Canvas
           src={this.state.curr_image}
           onCrop={this.handleCrop}

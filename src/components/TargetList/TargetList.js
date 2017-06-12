@@ -10,7 +10,7 @@ const TargetList = ({ images, onSelection }) => {
         i => (
           <ul key={i} id={i}>
             <button
-              onClick={() => onSelection(i)}
+              onClick={() => onSelection(parseInt(i, 10))}
             >
               <img
                 src={images[i]}
