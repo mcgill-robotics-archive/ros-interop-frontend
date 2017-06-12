@@ -41,10 +41,14 @@ class App extends React.Component {
       notification: undefined,
     };
 
-    // ROS Client.
+    // ROS connection.
+    this.connect('ws://localhost:9090');
+  }
+
+  connect = (address) => {
     this.remoteIDs = {};
     this.client = new ROSClient(this.notify);
-    this.client.connect('ws://kinetic:9090', this.loadRemoteTargets);
+    this.client.connect(address, this.loadRemoteTargets);
   }
 
   loadRemoteTargets = () => {
