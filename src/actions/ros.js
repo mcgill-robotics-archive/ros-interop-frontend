@@ -16,8 +16,7 @@ const rosMsgFromTarget = target => ({
   longitude: 0,
 });
 
-const targetFromRosMsg = (targetMsg, id) => ({
-  id,
+const targetFromRosMsg = targetMsg => ({
   type: targetMsg.type.data,
   orientation: targetMsg.orientation.data,
   shape: targetMsg.shape.data,
@@ -120,7 +119,7 @@ class ROSClient {
         for (let i = 0; i < result.ids.length; i += 1) {
           const id = parseInt(result.ids[i], 10);
           const targetMsg = result.targets[i];
-          targets[id] = targetFromRosMsg(targetMsg, id);
+          targets[id] = targetFromRosMsg(targetMsg);
         }
         cb(targets);
       } else {
@@ -141,15 +140,15 @@ class ROSClient {
     });
   }
 
-  updateTarget(target, cb) {
+  updateTarget(id, target, cb) {
     const targetMsg = rosMsgFromTarget(target);
     const request = new ROSLIB.ServiceRequest({
-      id: target.id,
+      id,
       target: targetMsg,
     });
     this.updateTargetClient.callService(request, (result) => {
       if (result.success && cb) {
-        cb(target.id);
+        cb(id);
       } else {
         this.notificationCb('FAILED TO UPDATE TARGET');
       }
@@ -158,7 +157,7 @@ class ROSClient {
 
   setTarget(id, target, cb) {
     if (id !== undefined) {
-      this.updateTarget(target, cb);
+      this.updateTarget(id, target, cb);
     } else {
       this.addTarget(target, cb);
     }
