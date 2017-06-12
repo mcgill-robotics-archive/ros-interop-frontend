@@ -13,7 +13,6 @@ class Target extends React.Component {
   };
 
   static colors = [
-    { value: '', label: 'UNDEFINED' },
     { value: 'black', label: 'Black' },
     { value: 'blue', label: 'Blue' },
     { value: 'brown', label: 'Brown' },
@@ -27,7 +26,6 @@ class Target extends React.Component {
   ];
 
   static shapes = [
-    { value: '', label: 'UNDEFINED' },
     { value: 'circle', label: 'Circle' },
     { value: 'cross', label: 'Cross' },
     { value: 'heptagon', label: 'Heptagon' },
@@ -44,7 +42,6 @@ class Target extends React.Component {
   ];
 
   static orientations = [
-    { value: '', label: 'UNDEFINED' },
     { value: 'n', label: 'North' },
     { value: 'ne', label: 'North-East' },
     { value: 'e', label: 'East' },
@@ -64,12 +61,11 @@ class Target extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: undefined,
       alphanumeric: '',
-      background_color: '',
-      alphanumeric_color: '',
-      orientation: '',
-      shape: '',
+      background_color: 'black',
+      alphanumeric_color: 'black',
+      orientation: 'n',
+      shape: 'circle',
       type: 'standard',
       description: '',
     };
@@ -123,7 +119,6 @@ class Target extends React.Component {
 
   handleDelete = (event) => {
     event.preventDefault();
-
     if (this.props.onDelete !== undefined) {
       this.props.onDelete(this.props.index);
     }
