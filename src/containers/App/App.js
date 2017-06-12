@@ -42,9 +42,9 @@ class App extends React.Component {
     };
 
     // ROS Client.
+    this.remoteIDs = {};
     this.client = new ROSClient(this.notify);
     this.client.connect('ws://kinetic:9090', this.loadRemoteTargets);
-    this.remoteIDs = {};
   }
 
   loadRemoteTargets = () => {
@@ -95,7 +95,10 @@ class App extends React.Component {
           return i;
         });
       });
-      this.notify(`LOADED ${Object.keys(targets).length} TARGETS`);
+
+      const targetCount = Object.keys(targets).length;
+      this.notify(`LOADED ${targetCount} TARGETS`);
+      this.handleNewTarget(false);
     });
   };
 
@@ -152,7 +155,7 @@ class App extends React.Component {
     });
   };
 
-  handleNewTarget = () => {
+  handleNewTarget = (notify = true) => {
     const newIndex = this.state.latest_index + 1;
     this.state.targets[newIndex] = (
       <Target
@@ -169,7 +172,7 @@ class App extends React.Component {
       targets: this.state.targets,
       focused_index: newIndex,
     }, () => {
-      if (newIndex > 1) {
+      if (notify) {
         // Don't notify on app launch.
         this.notify(`NEW TARGET ${newIndex}`);
       }
