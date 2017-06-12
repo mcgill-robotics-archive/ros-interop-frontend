@@ -28,15 +28,31 @@ const targetFromRosMsg = (targetMsg, id) => ({
 });
 
 const compressedImageFromDataURL = (dataURL) => {
-  const base64 = dataURL.replace('data:image/png;base64,', '');
+  const pngHeader = 'data:image/png;base64,';
+  const jpegHeader = 'data:image/jpeg;base64,';
+
+  let format;
+  let base64;
+  if (dataURL.startsWith(pngHeader)) {
+    format = 'png';
+    base64 = dataURL.replace(pngHeader, '');
+  } else {
+    format = 'jpeg';
+    base64 = dataURL.replace(jpegHeader, '');
+  }
+
   const blob = atob(base64);
   const data = new Array(blob.length);
   for (let i = 0; i < blob.length; i += 1) {
     data[i] = blob.charCodeAt(i);
   }
 
-  return { format: 'png', data };
+  return { format, data };
 };
+
+const dataURLFromCompressedImage = img => (
+  `data:image/${img.format};base64,${img.data}`
+);
 
 
 class ROSClient {
@@ -44,10 +60,15 @@ class ROSClient {
     this.notificationCb = notificationCb;
   }
 
-  connect(addr) {
+  connect(addr, cb) {
     // Connect and set up connection callbacks.
     this.ros = new ROSLIB.Ros({ url: addr });
-    this.ros.on('connection', () => this.notificationCb('CONNECTED'));
+    this.ros.on('connection', () => {
+      this.notificationCb('CONNECTED');
+      if (cb) {
+        cb();
+      }
+    });
     this.ros.on('error', e => this.notificationCb(`ERROR CONNECTING: ${e}`));
     this.ros.on('close', () => this.notificationCb('DISCONNECTED'));
 
@@ -93,14 +114,13 @@ class ROSClient {
 
   getAllTargets(cb) {
     const request = new ROSLIB.ServiceRequest({});
-    this.addTargetClient.callService(request, (result) => {
+    this.getAllTargetsClient.callService(request, (result) => {
       if (result.success) {
         const targets = {};
         for (let i = 0; i < result.ids.length; i += 1) {
-          const id = result.ids[i];
+          const id = parseInt(result.ids[i], 10);
           const targetMsg = result.targets[i];
-          const target = targetFromRosMsg(targetMsg, id);
-          targets[id] = target;
+          targets[id] = targetFromRosMsg(targetMsg, id);
         }
         cb(targets);
       } else {
@@ -173,7 +193,8 @@ class ROSClient {
     const request = new ROSLIB.ServiceRequest({ id });
     this.getTargetImageClient.callService(request, (result) => {
       if (result.success && cb) {
-        cb(id, result.image.data);
+        const dataURL = dataURLFromCompressedImage(result.image);
+        cb(id, dataURL);
       } else {
         this.notificationCb('FAILED TO GET TARGET IMAGE');
       }

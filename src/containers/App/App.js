@@ -43,13 +43,61 @@ class App extends React.Component {
 
     // ROS Client.
     this.client = new ROSClient(this.notify);
-    this.client.connect('ws://kinetic:9090');
+    this.client.connect('ws://kinetic:9090', this.loadRemoteTargets);
     this.remoteIDs = {};
   }
 
-  componentWillMount() {
-    this.handleNewTarget();
-  }
+  loadRemoteTargets = () => {
+    let latestIndex = 0;
+    this.client.getAllTargets((targetStates) => {
+      const targets = {};
+      Object.keys(targetStates).map((i) => {
+        const id = parseInt(i, 10);
+
+        this.remoteIDs[id] = id;
+        const instance = new RestorableInstance();
+        const state = targetStates[id];
+        instance.save((ctx) => {
+          ctx.setState(state);
+          ctx.setSavedState(state);
+        });
+
+        targets[id] = (
+          <Target
+            key={id}
+            index={id}
+            instance={instance}
+            onDelete={this.handleDeleteTarget}
+            onSubmit={this.handleSubmitTarget}
+          />
+        );
+
+        latestIndex = Math.max(latestIndex, i);
+
+        // It's expecting a return value.
+        return i;
+      });
+
+      this.setState({
+        targets,
+        latest_index: latestIndex,
+      }, () => {
+        Object.keys(targets).map((i) => {
+          const id = parseInt(i, 10);
+          this.client.getTargetImage(id, (_, img) => {
+            this.state.target_images[id] = img;
+            this.setState({
+              target_images: this.state.target_images,
+            });
+          });
+
+          // It's expecting a return value.
+          return i;
+        });
+      });
+      this.notify(`LOADED ${Object.keys(targets).length} TARGETS`);
+    });
+  };
 
   handleCrop = (previewImage) => {
     this.setState({
