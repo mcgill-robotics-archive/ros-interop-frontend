@@ -13,7 +13,7 @@ execute_process(COMMAND npm install ${PROJECT_SOURCE_DIR}
 
 # Build NPM package
 
-execute_process(COMMAND npm build ${PROJECT_SOURCE_DIR}
+execute_process(COMMAND npm run build ${PROJECT_SOURCE_DIR}
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 ## System dependencies are found with CMake's conventions
