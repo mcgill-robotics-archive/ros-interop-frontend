@@ -2,6 +2,8 @@ import React from 'react';
 import { ROSClient, FSImageSource } from '../../actions';
 import { Canvas, Target, Sidebar, TargetList, Notification } from '../../components';
 
+const { dialog } = window.require('electron').remote;
+
 
 class RestorableInstance {
   constructor() {
@@ -23,7 +25,10 @@ class RestorableInstance {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const path = 'images';
+    const path = dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })[0];
+
     this.image_source = new FSImageSource(
       path,
       () => {
