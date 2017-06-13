@@ -42,12 +42,28 @@ This can be done as follows:
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 ```
 
-## Running
+## Running the server
+For this frontend to communicate with the ROS `interop` client, you will need to
+run the `rosbridge_server` alongside the `interop` client. This can be done by
+simply following the `interop`'s instructions and also running:
+
+```bash
+roslaunch rosbridge_server rosbridge_websocket.launch
+```
+
+in another terminal. The address or hostname of the machine running this server
+will need to be known and port `9090` will need to be open for the frontend to
+reach it.
+
+## Running this frontend
 
 ### Running in ROS
 ```bash
 rosrun interop_frontend interop_frontend
 ```
+
+You will be prompted for an address or hostname on startup. This is the address
+`rosbridge_server` should be running on.
 
 ### Running Dev Server
 ```bash
