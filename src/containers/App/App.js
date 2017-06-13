@@ -123,7 +123,6 @@ class App extends React.Component {
   updateImage = () => this.setState({ curr_image: this.image_source.curr() });
 
   handleKeyPress = (e) => {
-    console.log(e);
     switch (e.key) {
       // Ctrl+A
       case 'a':
