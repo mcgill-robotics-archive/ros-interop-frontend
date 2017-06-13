@@ -17,15 +17,15 @@ class Prompt extends React.Component {
   };
 
   state = {
-    value: undefined,
+    value: '',
   };
 
   componentWillMount() {
     this.setState({ value: this.props.default });
   }
 
-  handleChange = (target) => {
-    this.setState({ value: target.value });
+  handleChange = (e) => {
+    this.setState({ value: e.target.value || '' });
   };
 
   handleSubmit = () => {
