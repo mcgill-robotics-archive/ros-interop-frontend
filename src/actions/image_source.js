@@ -48,13 +48,13 @@ export class FSImageSource extends BaseImageSource {
     });
   }
 
-  prev = () => {
+  prev = (jump = 1) => {
     if (this.curr_index <= 0) {
       this.notificationCb('REACHED BEGINNING');
       return;
     }
 
-    this.curr_index -= 1;
+    this.curr_index = Math.max(0, this.curr_index - jump);
   };
 
   curr = () => {
@@ -66,12 +66,12 @@ export class FSImageSource extends BaseImageSource {
     return '';
   };
 
-  next = () => {
+  next = (jump = 1) => {
     if (this.curr_index >= this.files.length - 1) {
       this.notificationCb('REACHED END');
       return;
     }
 
-    this.curr_index += 1;
+    this.curr_index = Math.min(this.curr_index + jump, this.files.length - 1);
   };
 }
