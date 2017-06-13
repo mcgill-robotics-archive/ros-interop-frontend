@@ -1,6 +1,6 @@
 import React from 'react';
 import { ROSClient, FSImageSource } from '../../actions';
-import { Canvas, Target, Sidebar, TargetList, Notification } from '../../components';
+import { Canvas, Target, Prompt, Sidebar, TargetList, Notification } from '../../components';
 
 const { dialog } = window.require('electron').remote;
 
@@ -25,8 +25,36 @@ class RestorableInstance {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      // Targets.
+      targets: {},
+      target_images: {},
+      latest_index: 0,
+
+      // Frame.
+      curr_image: undefined,
+
+      // Active target.
+      focused_index: undefined,
+      preview_image: undefined,
+      new_target: undefined,
+
+      // Modals.
+      notification: undefined,
+      prompt: undefined,
+      disabled: true,
+    };
+  }
+
+  componentWillMount() {
+    // Set up ROS connection, then ask for directory.
+    this.requestAddress(this.requestDirectory);
+  }
+
+  requestDirectory = () => {
     const path = dialog.showOpenDialog({
-      properties: ['openDirectory']
+      title: 'Select where your images are stored',
+      properties: ['openDirectory'],
     })[0];
 
     this.image_source = new FSImageSource(
@@ -36,33 +64,31 @@ class App extends React.Component {
         document.onkeypress = this.handleKeyPress;
       },
       this.notify);
-
-    this.state = {
-      // Targets.
-      targets: {},
-      target_images: {},
-      latest_index: 0,
-
-      // Frame.
-      curr_image: this.image_source.curr(),
-
-      // Active target.
-      focused_index: undefined,
-      preview_image: undefined,
-      new_target: undefined,
-
-      // Notification container.
-      notification: undefined,
-    };
-
-    // ROS connection.
-    this.connect('ws://localhost:9090');
   }
+
+  requestAddress = (cb) => {
+    const prompt = (
+      <Prompt
+        message="Connect"
+        default="localhost"
+        placeholder="Hostname or IP address of interop client"
+        onSubmit={(address) => {
+          this.setState({
+            prompt: undefined,
+          }, () => {
+            this.connect(address);
+            this.setState({ disabled: false }, cb);
+          });
+        }}
+      />
+    );
+    this.setState({ prompt });
+  };
 
   connect = (address) => {
     this.remoteIDs = {};
     this.client = new ROSClient(this.notify);
-    this.client.connect(address, this.loadRemoteTargets);
+    this.client.connect(`ws://${address}:9090`, this.loadRemoteTargets);
   }
 
   loadRemoteTargets = () => {
@@ -238,21 +264,24 @@ class App extends React.Component {
 
     return (
       <div className={styles.container}>
+        {this.state.prompt}
         {this.state.notification}
-        <Canvas
-          src={this.state.curr_image}
-          onCrop={this.handleCrop}
-        />
-        <Sidebar
-          preview={this.state.preview_image}
-          target={this.state.targets[this.state.focused_index]}
-          onNewTarget={this.handleNewTarget}
-          newTargetEnabled={!this.state.new_target}
-        />
-        <TargetList
-          images={this.state.target_images}
-          onSelection={this.handleFocus}
-        />
+        <div hidden={this.state.disabled}>
+          <Canvas
+            src={this.state.curr_image}
+            onCrop={this.handleCrop}
+          />
+          <Sidebar
+            preview={this.state.preview_image}
+            target={this.state.targets[this.state.focused_index]}
+            onNewTarget={this.handleNewTarget}
+            newTargetEnabled={!this.state.new_target}
+          />
+          <TargetList
+            images={this.state.target_images}
+            onSelection={this.handleFocus}
+          />
+        </div>
       </div>
     );
   }
