@@ -31,7 +31,6 @@ class Canvas extends React.Component {
           ref={(c) => { this.cropper = c; }}
           src={this.props.src}
           onChange={this.handleCrop}
-          onImgLoad={this.handleCrop}
         />
       </div>
     );
