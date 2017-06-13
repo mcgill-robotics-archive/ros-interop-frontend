@@ -44,18 +44,22 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 ## Running
 
+### Running in ROS
+```bash
+rosrun interop_frontend interop_frontend
+```
+
 ### Running Dev Server
-````
+```bash
 npm run dev
-````
+```
 
 ### Building and Running Production
-````
+```bash
 npm run build
 npm run start
-````
+```
 
 ## Credits
 This application was based on [hahcoon's boilerplate]
 (https://github.com/hahcoon/react-electron-boilerplate.git).
-
