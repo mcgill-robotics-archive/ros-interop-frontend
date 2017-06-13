@@ -90,6 +90,9 @@ const webpackConfig = {
   progress: true,
   resolve: {
     extensions: ['', '.js', '.jsx'],
+  },
+  node: {
+    fs: "empty"
   }
 };
 

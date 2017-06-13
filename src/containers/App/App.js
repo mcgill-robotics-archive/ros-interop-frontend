@@ -1,5 +1,5 @@
 import React from 'react';
-import ROSClient from '../../actions/ros';
+import { ROSClient, FSImageSource } from '../../actions';
 import { Canvas, Target, Sidebar, TargetList, Notification } from '../../components';
 
 
@@ -23,6 +23,15 @@ class RestorableInstance {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    const path = 'images';
+    this.image_source = new FSImageSource(
+      path,
+      () => {
+        this.updateImage();
+        document.onkeypress = this.handleKeyPress;
+      },
+      this.notify);
+
     this.state = {
       // Targets.
       targets: {},
@@ -30,7 +39,7 @@ class App extends React.Component {
       latest_index: 0,
 
       // Frame.
-      curr_image: 'http://roadmanfong.github.io/react-cropper/example/img/child.jpg',
+      curr_image: this.image_source.curr(),
 
       // Active target.
       focused_index: undefined,
@@ -104,6 +113,30 @@ class App extends React.Component {
       this.notify(`LOADED ${targetCount} TARGETS`);
       this.handleNewTarget(false);
     });
+  };
+
+  updateImage = () => this.setState({ curr_image: this.image_source.curr() });
+
+  handleKeyPress = (e) => {
+    console.log(e);
+    switch (e.key) {
+      // Ctrl+A
+      case 'a':
+        if (e.ctrlKey && this.image_source.canRewind()) {
+          this.image_source.prev();
+          this.updateImage();
+        }
+        break;
+      // Ctrl+D
+      case 'd':
+        if (e.ctrlKey && this.image_source.canSeek()) {
+          this.image_source.next();
+          this.updateImage();
+        }
+        break;
+      default:
+        break;
+    }
   };
 
   handleCrop = (previewImage) => {
