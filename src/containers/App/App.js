@@ -52,13 +52,16 @@ class App extends React.Component {
   }
 
   requestDirectory = () => {
-    const path = dialog.showOpenDialog({
-      title: 'Select where your images are stored',
-      properties: ['openDirectory'],
-    })[0];
+    let pathList;
+    while (!pathList) {
+      pathList = dialog.showOpenDialog({
+        title: 'Select where your images are stored',
+        properties: ['openDirectory'],
+      });
+    }
 
     this.image_source = new FSImageSource(
-      path,
+      pathList[0],
       () => {
         this.updateImage();
         document.onkeypress = this.handleKeyPress;
