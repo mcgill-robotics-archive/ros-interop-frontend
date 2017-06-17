@@ -152,6 +152,12 @@ class App extends React.Component {
   updateImage = () => this.setState({ curr_image: this.image_source.curr() });
 
   handleKeyDown = (e) => {
+    if (e.target !== document.body) {
+      // Only trigger if running on the body.
+      // This is to avoid affecting text areas for example.
+      return;
+    }
+
     switch (e.key) {
       // Ctrl+A or left for previous.
       case 'a':
