@@ -64,7 +64,7 @@ class App extends React.Component {
       pathList[0],
       () => {
         this.updateImage();
-        document.onkeypress = this.handleKeyPress;
+        document.onkeydown = this.handleKeyDown;
       },
       this.notify);
   }
@@ -151,18 +151,29 @@ class App extends React.Component {
 
   updateImage = () => this.setState({ curr_image: this.image_source.curr() });
 
-  handleKeyPress = (e) => {
+  handleKeyDown = (e) => {
     switch (e.key) {
-      // Ctrl+A
+      // Ctrl+A or left for previous.
       case 'a':
-        if (e.ctrlKey && this.image_source.canRewind()) {
+        if (!e.ctrlKey) {
+          break;
+        }
+        // Fallthrough.
+      case 'ArrowLeft':
+        if (this.image_source.canRewind()) {
           this.image_source.prev();
           this.updateImage();
         }
         break;
-      // Ctrl+D
+
+      // Ctrl+D or right for next.
       case 'd':
-        if (e.ctrlKey && this.image_source.canSeek()) {
+        if (!e.ctrlKey) {
+          break;
+        }
+        // Fallthrough.
+      case 'ArrowRight':
+        if (this.image_source.canSeek()) {
           this.image_source.next();
           this.updateImage();
         }
