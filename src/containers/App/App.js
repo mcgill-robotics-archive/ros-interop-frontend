@@ -154,17 +154,11 @@ class App extends React.Component {
   handleKeyDown = (e) => {
     if (e.target.type === 'text' || e.target.type === 'textarea') {
       // This is to avoid affecting writing.
-      console.log(e);
       return;
     }
 
     switch (e.key) {
-      // Ctrl+A or left for previous.
-      case 'a':
-        if (!e.ctrlKey) {
-          break;
-        }
-        // Fallthrough.
+      // Left arrow for previous.
       case 'ArrowLeft':
         if (this.image_source.canRewind()) {
           this.image_source.prev();
@@ -172,12 +166,7 @@ class App extends React.Component {
         }
         break;
 
-      // Ctrl+D or right for next.
-      case 'd':
-        if (!e.ctrlKey) {
-          break;
-        }
-        // Fallthrough.
+      // Right arrow for next.
       case 'ArrowRight':
         if (this.image_source.canSeek()) {
           this.image_source.next();
