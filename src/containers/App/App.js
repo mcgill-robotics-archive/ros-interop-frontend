@@ -152,9 +152,9 @@ class App extends React.Component {
   updateImage = () => this.setState({ curr_image: this.image_source.curr() });
 
   handleKeyDown = (e) => {
-    if (e.target !== document.body) {
-      // Only trigger if running on the body.
-      // This is to avoid affecting text areas for example.
+    if (e.target.type === 'text' || e.target.type === 'textarea') {
+      // This is to avoid affecting writing.
+      console.log(e);
       return;
     }
 
