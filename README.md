@@ -67,11 +67,13 @@ You will be prompted for an address or hostname on startup. This is the address
 
 ### Running Dev Server
 ```bash
+npm install
 npm run dev
 ```
 
 ### Building and Running Production
 ```bash
+npm install
 npm run build
 npm run start
 ```
