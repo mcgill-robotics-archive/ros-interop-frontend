@@ -66,7 +66,8 @@ const webpackConfig = {
   },
   plugins: [
     new CleanPlugin([distPath], {
-      root: rootPath
+      root: rootPath,
+      verbose: false
     }),
     new HtmlWebpackPlugin({
       title: config.app.title,
