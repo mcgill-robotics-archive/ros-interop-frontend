@@ -19,6 +19,7 @@ fs.writeFile('./build/package.json', JSON.stringify(pkg), (err) => {
       icon: './src/assets/images/ros.ico',
       prune: false,
       quiet: true,
+      tmpdir: false,
       out: './release',
     }, (err) => {
       if (err) {
