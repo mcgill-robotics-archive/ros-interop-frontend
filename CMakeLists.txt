@@ -36,7 +36,7 @@ add_custom_target(
   copy_src_to_devel
   DEPENDS clean_src_npm
   COMMENT Copying ${PROJECT_NAME}'s src files to devel
-  COMMAND cp -rf ${PROJECT_SOURCE_DIR} ${CATKIN_DEVEL_PREFIX})
+  COMMAND cp -rf ${PROJECT_SOURCE_DIR} ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION})
 
 ## Install NPM dependencies
 add_custom_target(
@@ -45,7 +45,7 @@ add_custom_target(
   COMMENT Installing ${PROJECT_NAME}'s dependencies
   COMMAND
   npm install --no-save --no-optional
-    --prefix ${CATKIN_DEVEL_PREFIX}/${PROJECT_NAME}
+    --prefix ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME}
   BYPRODUCTS node_modules
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
@@ -56,7 +56,7 @@ add_custom_target(
   COMMENT Building ${PROJECT_NAME}
   COMMAND npm run build
   BYPRODUCTS build
-  WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${PROJECT_NAME})
+  WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME})
 
 ## Package application
 add_custom_target(
@@ -66,4 +66,4 @@ add_custom_target(
   COMMENT Packaging up ${PROJECT_NAME}
   COMMAND npm run package
   BYPRODUCTS release
-  WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${PROJECT_NAME})
+  WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME})
