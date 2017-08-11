@@ -1,4 +1,4 @@
-# ROS Interop Frontend 
+# ROS Interop Frontend
 
 This is an Electron application client to interface with the
 [`interop` package](https://github.com/mcgill-robotics/ros-interop.git).
@@ -79,5 +79,5 @@ npm run start
 ```
 
 ## Credits
-This application was based on [hahcoon's boilerplate]
-(https://github.com/hahcoon/react-electron-boilerplate.git).
+This application was based on
+[hahoocn's boilerplate](https://github.com/hahoocn/react-electron-boilerplate.git).
