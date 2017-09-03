@@ -74,40 +74,40 @@ class ROSClient {
     // Setup target service clients.
     this.getAllTargetsClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/all',
-      serviceType: 'interop/GetAllTargets',
+      name: '/interop/objects/all',
+      serviceType: 'interop/GetAllObjects',
     });
     this.addTargetClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/add',
-      serviceType: 'interop/AddTarget',
+      name: '/interop/objects/add',
+      serviceType: 'interop/AddObject',
     });
     this.updateTargetClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/update',
-      serviceType: 'interop/UpdateTarget',
+      name: '/interop/objects/update',
+      serviceType: 'interop/UpdateObject',
     });
     this.deleteTargetClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/delete',
-      serviceType: 'interop/DeleteTarget',
+      name: '/interop/objects/delete',
+      serviceType: 'interop/DeleteObject',
     });
 
     // Setup target image service clients.
     this.getTargetImageClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/image/compressed/get',
-      serviceType: 'interop/GetTargetCompressedImage',
+      name: '/interop/objects/image/compressed/get',
+      serviceType: 'interop/GetObjectCompressedImage',
     });
     this.setTargetImageClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/image/compressed/set',
-      serviceType: 'interop/SetTargetCompressedImage',
+      name: '/interop/objects/image/compressed/set',
+      serviceType: 'interop/SetObjectCompressedImage',
     });
     this.deleteTargetImageClient = new ROSLIB.Service({
       ros: this.ros,
-      name: '/interop/targets/image/delete',
-      serviceType: 'interop/DeleteTargetImage',
+      name: '/interop/objects/image/delete',
+      serviceType: 'interop/DeleteObjectImage',
     });
   }
 
@@ -118,7 +118,7 @@ class ROSClient {
         const targets = {};
         for (let i = 0; i < result.ids.length; i += 1) {
           const id = parseInt(result.ids[i], 10);
-          const targetMsg = result.targets[i];
+          const targetMsg = result.objects[i];
           targets[id] = targetFromRosMsg(targetMsg);
         }
         cb(targets);
@@ -130,7 +130,7 @@ class ROSClient {
 
   addTarget(target, cb) {
     const targetMsg = rosMsgFromTarget(target);
-    const request = new ROSLIB.ServiceRequest({ target: targetMsg });
+    const request = new ROSLIB.ServiceRequest({ object: targetMsg });
     this.addTargetClient.callService(request, (result) => {
       if (result.success && cb) {
         cb(result.id);
@@ -144,7 +144,7 @@ class ROSClient {
     const targetMsg = rosMsgFromTarget(target);
     const request = new ROSLIB.ServiceRequest({
       id,
-      target: targetMsg,
+      object: targetMsg,
     });
     this.updateTargetClient.callService(request, (result) => {
       if (result.success && cb) {
