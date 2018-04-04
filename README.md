@@ -1,5 +1,9 @@
 # ROS Interop Frontend
 
+[status]: https://dev.mcgillrobotics.com/buildStatus/icon?job=ros-interop-frontend/master
+[url]: https://dev.mcgillrobotics.com/job/ros-interop-frontend/job/master
+[![status]][url]
+
 This is an Electron application client to interface with the
 [`interop` package](https://github.com/mcgill-robotics/ros-interop.git).
 
