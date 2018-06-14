@@ -9,11 +9,9 @@ const rosMsgFromTarget = target => ({
   alphanumeric_color: { data: target.alphanumeric_color },
   alphanumeric: target.alphanumeric,
   description: target.description,
-
-  // Unset by GUI.
-  autonomous: false,
-  latitude: 0,
-  longitude: 0,
+  autonomous: target.autonomous,
+  latitude: target.latitude,
+  longitude: target.longitude,
 });
 
 const targetFromRosMsg = targetMsg => ({
@@ -22,8 +20,11 @@ const targetFromRosMsg = targetMsg => ({
   shape: targetMsg.shape.data,
   background_color: targetMsg.background_color.data,
   alphanumeric_color: targetMsg.alphanumeric_color.data,
-  alphanumeric: targetMsg.alphanumeric.data,
-  description: targetMsg.description.data,
+  alphanumeric: targetMsg.alphanumeric,
+  description: targetMsg.description,
+  autonomous: targetMsg.autonomous,
+  latitude: targetMsg.latitude,
+  longitude: targetMsg.longitude,
 });
 
 const compressedImageFromDataURL = (dataURL) => {
@@ -53,23 +54,32 @@ const dataURLFromCompressedImage = img => (
   `data:image/${img.format};base64,${img.data}`
 );
 
+const notificationFromRosMsg = notificationMsg => ({
+  type: notificationMsg.type,
+  id: notificationMsg.id,
+  target: targetFromRosMsg(notificationMsg.object),
+  image: undefined,
+  compressed_image: dataURLFromCompressedImage(notificationMsg.compressed_image),
+});
+
 
 class ROSClient {
-  constructor(notificationCb) {
-    this.notificationCb = notificationCb;
+  constructor(targetNotificationCb, guiNotificationCb) {
+    this.targetNotificationCb = targetNotificationCb;
+    this.guiNotificationCb = guiNotificationCb;
   }
 
   connect(addr, cb) {
     // Connect and set up connection callbacks.
     this.ros = new ROSLIB.Ros({ url: addr });
     this.ros.on('connection', () => {
-      this.notificationCb('CONNECTED');
+      this.guiNotificationCb('CONNECTED');
       if (cb) {
         cb();
       }
     });
-    this.ros.on('error', e => this.notificationCb(`ERROR CONNECTING: ${e}`));
-    this.ros.on('close', () => this.notificationCb('DISCONNECTED'));
+    this.ros.on('error', e => this.guiNotificationCb(`ERROR CONNECTING: ${e}`));
+    this.ros.on('close', () => this.guiNotificationCb('DISCONNECTED'));
 
     // Setup target service clients.
     this.getAllTargetsClient = new ROSLIB.Service({
@@ -109,6 +119,17 @@ class ROSClient {
       name: '/interop/objects/image/delete',
       serviceType: 'interop/DeleteObjectImage',
     });
+
+    // Setup ROS notification subscriber.
+    this.targetNotificationTopic = new ROSLIB.Topic({
+      ros: this.ros,
+      name: '/interop/objects/notification',
+      topicType: 'interop/ObjectNotification',
+    });
+    this.targetNotificationTopic.subscribe((msg) => {
+      const notification = notificationFromRosMsg(msg);
+      this.targetNotificationCb(notification);
+    });
   }
 
   getAllTargets(cb) {
@@ -123,7 +144,7 @@ class ROSClient {
         }
         cb(targets);
       } else {
-        this.notificationCb('FAILED TO GET ALL TARGETS');
+        this.guiNotificationCb('FAILED TO GET ALL TARGETS');
       }
     });
   }
@@ -135,7 +156,7 @@ class ROSClient {
       if (result.success && cb) {
         cb(result.id);
       } else {
-        this.notificationCb('FAILED TO ADD TARGET');
+        this.guiNotificationCb('FAILED TO ADD TARGET');
       }
     });
   }
@@ -150,7 +171,7 @@ class ROSClient {
       if (result.success && cb) {
         cb(id);
       } else {
-        this.notificationCb('FAILED TO UPDATE TARGET');
+        this.guiNotificationCb('FAILED TO UPDATE TARGET');
       }
     });
   }
@@ -169,7 +190,7 @@ class ROSClient {
       if (result.success && cb) {
         cb(id);
       } else {
-        this.notificationCb('FAILED TO DELETE TARGET');
+        this.guiNotificationCb('FAILED TO DELETE TARGET');
       }
     });
   }
@@ -183,7 +204,7 @@ class ROSClient {
       if (result.success && cb) {
         cb(id);
       } else {
-        this.notificationCb('FAILED TO SET TARGET IMAGE');
+        this.guiNotificationCb('FAILED TO SET TARGET IMAGE');
       }
     });
   }
@@ -195,7 +216,7 @@ class ROSClient {
         const dataURL = dataURLFromCompressedImage(result.image);
         cb(id, dataURL);
       } else {
-        this.notificationCb('FAILED TO GET TARGET IMAGE');
+        this.guiNotificationCb('FAILED TO GET TARGET IMAGE');
       }
     });
   }
@@ -206,7 +227,7 @@ class ROSClient {
       if (result.success && cb) {
         cb(id);
       } else {
-        this.notificationCb('FAILED TO DELETE TARGET IMAGE');
+        this.guiNotificationCb('FAILED TO DELETE TARGET IMAGE');
       }
     });
   }

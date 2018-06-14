@@ -1,8 +1,6 @@
 import React from 'react';
-import { ROSClient, FSImageSource } from '../../actions';
-import { Canvas, Target, Prompt, Sidebar, TargetList, Notification } from '../../components';
-
-const { dialog } = window.require('electron').remote;
+import { ROSClient } from '../../actions';
+import { Target, Prompt, Sidebar, TargetList, Notification } from '../../components';
 
 
 class RestorableInstance {
@@ -29,15 +27,11 @@ class App extends React.Component {
       // Targets.
       targets: {},
       target_images: {},
-      latest_index: 0,
-
-      // Frame.
-      curr_image: undefined,
+      is_new: {},
 
       // Active target.
       focused_index: undefined,
       preview_image: undefined,
-      new_target: undefined,
 
       // Modals.
       notification: undefined,
@@ -48,28 +42,10 @@ class App extends React.Component {
 
   componentWillMount() {
     // Set up ROS connection, then ask for directory.
-    this.requestAddress(this.requestDirectory);
+    this.requestAddress();
   }
 
-  requestDirectory = () => {
-    let pathList;
-    while (!pathList) {
-      pathList = dialog.showOpenDialog({
-        title: 'Select where your images are stored',
-        properties: ['openDirectory'],
-      });
-    }
-
-    this.image_source = new FSImageSource(
-      pathList[0],
-      () => {
-        this.updateImage();
-        document.onkeydown = this.handleKeyDown;
-      },
-      this.notify);
-  }
-
-  requestAddress = (cb) => {
+  requestAddress = () => {
     const prompt = (
       <Prompt
         message="Connect"
@@ -80,7 +56,7 @@ class App extends React.Component {
             prompt: undefined,
           }, () => {
             this.connect(address);
-            this.setState({ disabled: false }, cb);
+            this.setState({ disabled: false });
           });
         }}
       />
@@ -89,37 +65,20 @@ class App extends React.Component {
   };
 
   connect = (address) => {
-    this.remoteIDs = {};
-    this.client = new ROSClient(this.notify);
+    this.client = new ROSClient(this.handleNotification, this.notify);
     this.client.connect(`ws://${address}:9090`, this.loadRemoteTargets);
   }
 
   loadRemoteTargets = () => {
-    let latestIndex = 0;
     this.client.getAllTargets((targetStates) => {
       const targets = {};
+      const isNew = {};
       Object.keys(targetStates).map((i) => {
         const id = parseInt(i, 10);
 
-        this.remoteIDs[id] = id;
-        const instance = new RestorableInstance();
         const state = targetStates[id];
-        instance.save((ctx) => {
-          ctx.setState(state);
-          ctx.setSavedState(state);
-        });
-
-        targets[id] = (
-          <Target
-            key={id}
-            index={id}
-            instance={instance}
-            onDelete={this.handleDeleteTarget}
-            onSubmit={this.handleSubmitTarget}
-          />
-        );
-
-        latestIndex = Math.max(latestIndex, i);
+        targets[id] = this.createTarget(id, state);
+        isNew[id] = true;
 
         // It's expecting a return value.
         return i;
@@ -127,7 +86,7 @@ class App extends React.Component {
 
       this.setState({
         targets,
-        latest_index: latestIndex,
+        is_new: isNew,
       }, () => {
         Object.keys(targets).map((i) => {
           const id = parseInt(i, 10);
@@ -145,50 +104,15 @@ class App extends React.Component {
 
       const targetCount = Object.keys(targets).length;
       this.notify(`LOADED ${targetCount} TARGETS`);
-      this.handleNewTarget(false);
-    });
-  };
-
-  updateImage = () => this.setState({ curr_image: this.image_source.curr() });
-
-  handleKeyDown = (e) => {
-    if (e.target.type === 'text' || e.target.type === 'textarea') {
-      // This is to avoid affecting writing.
-      return;
-    }
-
-    switch (e.key) {
-      // Left arrow for previous.
-      case 'ArrowLeft':
-        if (this.image_source.canRewind()) {
-          this.image_source.prev();
-          this.updateImage();
-        }
-        break;
-
-      // Right arrow for next.
-      case 'ArrowRight':
-        if (this.image_source.canSeek()) {
-          this.image_source.next();
-          this.updateImage();
-        }
-        break;
-      default:
-        break;
-    }
-  };
-
-  handleCrop = (previewImage) => {
-    this.setState({
-      preview_image: previewImage,
     });
   };
 
   handleFocus = (index) => {
     const prevIndex = this.state.focused_index;
+    this.state.is_new[index] = false;
     this.setState({
-      new_target: false,
       focused_index: index,
+      is_new: this.state.is_new,
       preview_image: this.state.target_images[index],
     }, () => {
       if (index !== prevIndex) {
@@ -197,61 +121,127 @@ class App extends React.Component {
     });
   };
 
+  handleNotification = (notification) => {
+    const id = notification.id;
+
+    switch (notification.type) {
+      // ADDED_OBJECT
+      case 0:
+        this.state.targets[id] = this.createTarget(id, notification.target);
+        this.state.is_new[id] = true;
+        this.setState({ targets: this.state.targets, is_new: this.state.is_new });
+        break;
+
+      // UPDATED_OBJECT.
+      case 1:
+        this.state.targets[id] = this.createTarget(id, notification.target);
+        this.setState({ targets: this.state.targets });
+        break;
+
+      // DELETED_OBJECT.
+      case 2:
+        delete this.state.is_new[id];
+        delete this.state.targets[id];
+        delete this.state.target_images[id];
+        if (this.state.focused_index === id) {
+          this.setState({
+            focused_index: undefined,
+            preview_image: undefined,
+          });
+        }
+        this.setState({
+          targets: this.state.targets,
+          target_images: this.state.target_images,
+          is_new: this.state.is_new,
+        });
+        break;
+
+      // SET_IMAGE.
+      case 3:
+        // TODO
+        break;
+
+      // SET_COMPRESSED_IMAGE.
+      case 4:
+        this.state.target_images[id] = notification.compressed_image;
+        this.setState({ target_images: this.state.target_images });
+        break;
+
+      // DELETED_IMAGE.
+      case 5:
+        delete this.state.target_images[id];
+        if (this.state.focused_index === id) {
+          this.setState({
+            preview_image: undefined,
+          });
+        }
+        this.setState({ target_images: this.state.target_images });
+        break;
+
+      // RELOAD_ALL.
+      case 6:
+        this.setState({
+          focused_index: undefined,
+          preview_image: undefined,
+        }, this.loadRemoteTargets);
+        break;
+
+      // CLEAR_ALL.
+      case 7:
+        this.setState({
+          focused_index: undefined,
+          preview_image: undefined,
+          targets: {},
+          target_images: {},
+          is_new: {},
+        }, this.loadRemoteTargets);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  createTarget = (index, state) => {
+    const instance = new RestorableInstance();
+    instance.save((ctx) => {
+      ctx.setState(state);
+      ctx.setSavedState(state);
+    });
+
+    return (<Target
+      key={index}
+      index={index}
+      instance={instance}
+      onDelete={this.handleDeleteTarget}
+      onSubmit={this.handleSubmitTarget}
+    />);
+  }
+
   handleDeleteTarget = (index) => {
-    const remoteID = this.remoteIDs[index];
-    this.client.deleteTarget(remoteID, () => {
+    this.client.deleteTarget(index, () => {
       // This automatically deletes the corresponding image.
       delete this.state.target_images[index];
       delete this.state.targets[index];
-      delete this.remoteIDs[index];
+      delete this.state.is_new[index];
       this.setState({
         targets: this.state.targets,
         target_images: this.state.target_images,
+        is_new: this.state.is_new,
       }, () => this.notify(`DELETED TARGET ${index}`));
     });
   };
 
   handleSubmitTarget = (index, state) => {
-    const latestIndex = this.state.new_target
-      ? this.state.latest_index + 1
-      : this.state.latest_index;
     const image = this.state.preview_image;
-    const remoteID = this.remoteIDs[index];
 
-    this.client.setTarget(remoteID, state, (id) => {
-      this.remoteIDs[index] = id;
+    this.client.setTarget(index, state, (id) => {
       this.client.setTargetImage(id, image, () => {
         this.state.target_images[index] = image;
         this.setState({
-          new_target: false,
-          latest_index: latestIndex,
           target_images: this.state.target_images,
         }, () => this.notify(`SAVED TARGET ${index}`));
       });
-    });
-  };
-
-  handleNewTarget = (notify = true) => {
-    const newIndex = this.state.latest_index + 1;
-    this.state.targets[newIndex] = (
-      <Target
-        key={newIndex}
-        index={newIndex}
-        instance={new RestorableInstance()}
-        onDelete={this.handleDeleteTarget}
-        onSubmit={this.handleSubmitTarget}
-      />
-    );
-
-    this.setState({
-      new_target: true,
-      targets: this.state.targets,
-      focused_index: newIndex,
-    }, () => {
-      if (notify) {
-        // Don't notify on app launch.
-        this.notify(`NEW TARGET ${newIndex}`);
-      }
     });
   };
 
@@ -276,17 +266,13 @@ class App extends React.Component {
         {this.state.prompt}
         {this.state.notification}
         <div hidden={this.state.disabled}>
-          <Canvas
-            src={this.state.curr_image}
-            onCrop={this.handleCrop}
-          />
           <Sidebar
             preview={this.state.preview_image}
             target={this.state.targets[this.state.focused_index]}
-            onNewTarget={this.handleNewTarget}
-            newTargetEnabled={!this.state.new_target}
           />
           <TargetList
+            focused={this.state.focused_index}
+            is_new={this.state.is_new}
             images={this.state.target_images}
             onSelection={this.handleFocus}
           />

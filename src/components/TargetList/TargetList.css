@@ -7,20 +7,39 @@ $thumbnailSize: 128px;
 
 .content {
   background-color: #f6f6f6;
-  width: calc(100vw - 360px);
-  height: $thumbnailSize;
+  width: calc(100vw - 370px);
+  height: 100%;
   position: fixed;
-  bottom: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: 5px;
 }
 
-.content ul {
+ul {
   display: inline-block;
+  border-style: solid;
+  border-color: #EEEEEE;
+  border-width: 1px;
+  margin: 1px;
+  width: $thumbnailSize;
+  height: $thumbnailSize;
+  opacity: 0.7;
 }
 
-.content button {
+ul:hover {
+  opacity: 1.0;
+}
+
+.focused {
+  opacity: 1.0;
+  border-color: #333333;
+}
+
+.new {
+  border-color: rgba(0, 128, 255, 0.5);
+}
+
+button {
   -webkit-appearance: none;
   -webkit-border-radius: 0;
   cursor: pointer;
@@ -30,12 +49,7 @@ $thumbnailSize: 128px;
   height: $thumbnailSize;
 }
 
-.content img {
+img {
   width: $thumbnailSize;
   height: $thumbnailSize;
-  opacity: 0.8;
-}
-
-.content img:hover {
-  opacity: 1.0;
 }

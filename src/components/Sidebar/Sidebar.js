@@ -16,13 +16,6 @@ const Sidebar = (props) => {
           alt="preview"
         />
         {props.target}
-        <button
-          className={styles.add}
-          onClick={props.onNewTarget}
-          disabled={!props.newTargetEnabled}
-        >
-          NEW TARGET
-        </button>
       </div>
     </div>
   );
@@ -31,8 +24,6 @@ const Sidebar = (props) => {
 Sidebar.propTypes = {
   preview: PropTypes.string,
   target: PropTypes.object,
-  newTargetEnabled: PropTypes.bool,
-  onNewTarget: PropTypes.func.isRequired,
 };
 
 export default Sidebar;

@@ -68,6 +68,9 @@ class Target extends React.Component {
       shape: 'circle',
       type: 'standard',
       description: '',
+      latitude: 0.0,
+      longitude: 0.0,
+      autonomous: false,
     };
 
     this.savedState = undefined;
@@ -92,6 +95,7 @@ class Target extends React.Component {
   }
 
   save = () => {
+    console.log(this.state);
     const state = this.state;
     this.setSavedState(state);
     this.props.instance.save((ctx) => {
@@ -104,6 +108,7 @@ class Target extends React.Component {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
+    console.log(event);
     this.setState({
       [name]: value,
     });
@@ -111,10 +116,14 @@ class Target extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.save();
-    if (this.props.onSubmit !== undefined) {
-      this.props.onSubmit(this.props.index, this.state);
-    }
+    this.setState({
+      autonomous: false,
+    }, () => {
+      this.save();
+      if (this.props.onSubmit !== undefined) {
+        this.props.onSubmit(this.props.index, this.state);
+      }
+    });
   };
 
   handleDelete = (event) => {
