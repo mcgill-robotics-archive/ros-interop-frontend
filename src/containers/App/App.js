@@ -67,6 +67,7 @@ class App extends React.Component {
   connect = (address) => {
     this.client = new ROSClient(this.handleNotification, this.notify);
     this.client.connect(`ws://${address}:9090`, this.loadRemoteTargets);
+    document.onkeydown = this.handleKeyDown;
   }
 
   loadRemoteTargets = () => {
@@ -108,6 +109,7 @@ class App extends React.Component {
   };
 
   handleFocus = (index) => {
+    if (isNaN(index) || this.state.targets[index] === undefined) return;
     const prevIndex = this.state.focused_index;
     this.state.is_new[index] = false;
     this.setState({
@@ -120,6 +122,45 @@ class App extends React.Component {
       }
     });
   };
+
+  closestIndex = (id, direction) => {
+    const offsetIndex = (direction === 'prev') ? -1 : 1;
+    const targetIds = Object.keys(this.state.targets);
+    const closestIndex = targetIds.indexOf(id.toString()) + offsetIndex;
+    return parseInt(targetIds[closestIndex], 10);
+  }
+
+  handleKeyDown = (e) => {
+    if (e.target.type === 'text' || e.target.type === 'textarea') {
+      // This is to avoid affecting writing.
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        if (this.state.focused_index !== undefined) {
+          this.handleFocus(this.closestIndex(this.state.focused_index, 'prev'));
+        }
+        break;
+
+      case 'ArrowRight':
+        if (this.state.focused_index !== undefined) {
+          this.handleFocus(this.closestIndex(this.state.focused_index, 'next'));
+        }
+        break;
+
+      case 'Delete':
+      case 'Backspace':
+        this.handleDeleteTarget(this.state.focused_index);
+        if (this.state.focused_index !== undefined) {
+          this.handleFocus(this.closestIndex(this.state.focused_index, 'next'));
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
 
   handleNotification = (notification) => {
     const id = notification.id;
